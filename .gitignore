@@ -1,0 +1,32 @@
+# Ignore Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Ignore compiled output and temporary files
+bin/
+obj/
+*.log
+*.tmp
+
+# Ignore node modules (if applicable)
+node_modules/
+
+# Ignore environment variable files
+.env
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Git-specific files
+!.git/
+!.github/
+
+# Ignore client and server build files (if applicable)
+client/dist/
+server/dist/
+
+# Keep these essential files
+!project.sln
+!readme.md
