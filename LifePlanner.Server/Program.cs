@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using LifePlanner.Server.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<LifePlannerServerContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LifePlannerServerContext") ?? throw new InvalidOperationException("Connection string 'LifePlannerServerContext' not found.")));
 
 // Add services to the container.
 
