@@ -22,5 +22,13 @@ namespace LifePlanner.Server.Models
         public List<DailyAgenda> DailyAgendas { get; set; }
         public List<DailyTask> DailyTasks { get; set; }
 
+        public User()
+        {
+            Goals = new List<Goal>();
+            MonthlyGoals = new List<MonthlyGoal>();
+            DailyAgendas = new List<DailyAgenda>();
+            DailyTasks = new List<DailyTask>();
+        }
+
     }
 }

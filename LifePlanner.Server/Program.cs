@@ -2,6 +2,18 @@
 using Microsoft.Extensions.DependencyInjection;
 using LifePlanner.Server.Data;
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+
 builder.Services.AddDbContext<LifePlannerServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LifePlannerServerContext") ?? throw new InvalidOperationException("Connection string 'LifePlannerServerContext' not found.")));
 
@@ -12,7 +24,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add authentication and authorization
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseCors("AllowAll");
+
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -26,6 +45,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

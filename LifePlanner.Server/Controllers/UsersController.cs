@@ -42,6 +42,20 @@ namespace LifePlanner.Server.Controllers
             return user;
         }
 
+        // GET: api/users/auth0/auth0|5f7e7b7b7b7b7b7b7b7b7b7b7b7b7b7
+        [HttpGet("auth0/{auth0Id}")]
+        public async Task<ActionResult<User>> GetUserByAuth0Id(string auth0Id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Auth0Id == auth0Id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
+
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
