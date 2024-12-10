@@ -1,24 +1,20 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Header from "./Header";
 
 const LayoutDashboard: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="bg-blue-500 text-white p-4 w-full">
-        <h1 className="text-lg font-bold">Dashboard</h1>
-      </header>
+    <div className="flex flex-col h-screen">
+      {/* Header */}
+      <Header />
 
-      {/* Main Content */}
-      <main className="flex-grow p-4">{children}</main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white text-center py-2">
-        <p>� 2024 Dashboard enzoowwww</p>
-      </footer>
+      {/* Main content area */}
+      <main className="flex-1 p-6 overflow-auto">
+        {/* Children content */}
+        {children}
+        {/* You can replace the content here with dynamic children */}
+      </main>
     </div>
   );
 };
