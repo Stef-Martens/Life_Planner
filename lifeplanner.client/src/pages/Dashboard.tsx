@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import LogoutButton from "../components/Buttons/LogoutButton";
 import { getUserByAuth0Id, createUser } from "../api/users"; // Removed updateUser
 import { User } from "../types/user";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -34,7 +33,7 @@ const Dashboard = () => {
   }, [user, isAuthenticated]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <span className="loading loading-spinner loading-lg"></span>;
   }
 
   return (
