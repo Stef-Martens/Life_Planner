@@ -92,6 +92,14 @@ namespace LifePlanner.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            // Check if auth0Id already exists
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Auth0Id == user.Auth0Id);
+
+            if (existingUser != null)
+            {
+                return BadRequest("User with this Auth0Id already exists");
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 

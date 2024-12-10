@@ -15,8 +15,8 @@ createRoot(document.getElementById("root")!).render(
       redirect_uri: "https://localhost:55583/dashboard",
     }}
   >
-    <StrictMode>
-      <App />
-    </StrictMode>
+    {/* <StrictMode> */}
+    <App />
+    {/* </StrictMode> */}
   </Auth0Provider>
 );
