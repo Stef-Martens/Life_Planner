@@ -1,12 +1,27 @@
-
-
+import { useEffect } from "react";
+import LoginButton from "../components/LoginButton";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Home = () => {
-    return (
-        <div>
-            <h1>Home</h1>
-        </div>
-    )
-}
+  const { isAuthenticated, isLoading } = useAuth0();
 
-export default Home
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      window.location.href = "/dashboard";
+    }
+  }, [isAuthenticated, isLoading]);
+
+  return (
+    <div>
+      <h1>Welcome to Life Planner</h1>
+      <p>Please log in to continue</p>
+      <LoginButton />
+    </div>
+  );
+};
+
+export default Home;
