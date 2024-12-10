@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LifePlanner.Server.Data;
 using LifePlanner.Server.Models;
+using LifePlanner.Server.Services.Interfaces;
 
 namespace LifePlanner.Server.Controllers
 {
@@ -14,25 +15,26 @@ namespace LifePlanner.Server.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly LifePlannerServerContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(LifePlannerServerContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _userService.GetAll();
+            return Ok(users);
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetById(id);
 
             if (user == null)
             {
@@ -46,7 +48,7 @@ namespace LifePlanner.Server.Controllers
         [HttpGet("auth0/{auth0Id}")]
         public async Task<ActionResult<User>> GetUserByAuth0Id(string auth0Id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Auth0Id == auth0Id);
+            var user = await _userService.GetByAuth0Id(auth0Id);
 
             if (user == null)
             {
@@ -65,12 +67,9 @@ namespace LifePlanner.Server.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _userService.Update(user);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -83,7 +82,6 @@ namespace LifePlanner.Server.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -93,38 +91,42 @@ namespace LifePlanner.Server.Controllers
         public async Task<ActionResult<User>> PostUser(User user)
         {
             // Check if auth0Id already exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Auth0Id == user.Auth0Id);
-
+            var existingUser = await _userService.GetByAuth0Id(user.Auth0Id);
             if (existingUser != null)
             {
-                return BadRequest("User with this Auth0Id already exists");
+                return Conflict();
             }
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            var newUser = await _userService.Add(user);
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            if (newUser != null)
+            {
+                return CreatedAtAction("GetUser", new { id = newUser.Id }, newUser);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.Delete(id);
             if (user == null)
             {
                 return NotFound();
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _userService.GetById(id) != null
+                ? true
+                : false;
         }
     }
 }
