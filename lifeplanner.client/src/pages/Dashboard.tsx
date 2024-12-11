@@ -30,7 +30,6 @@ const Dashboard = () => {
           name: user.name,
         };
 
-        console.log("Creating user:", newUser);
         await createUser(newUser);
         setUserRecord(newUser);
       }
@@ -46,7 +45,6 @@ const Dashboard = () => {
       setIsLoading(true);
       await fetchOrCreateUser();
 
-      console.log("User record:", userRecord);
       setIsLoading(false);
     };
 

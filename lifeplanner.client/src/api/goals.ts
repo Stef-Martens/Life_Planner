@@ -35,7 +35,17 @@ export function useGoalApi() {
   const apiClient = useApiClient();
 
   return {
-    getGoals: (userId: number) => apiClient<Goal[]>(`/users/${userId}/goals`),
+    getGoals: (userId: number) =>
+      apiClient<Goal[]>(
+        `/users/${userId}/goals`,
+        undefined,
+        async (response) => {
+          if (response.status === 404) {
+            return [];
+          }
+          throw new Error("Failed to fetch goals");
+        }
+      ),
     createGoal: (userId: number, goal: Goal) =>
       apiClient<Goal>(`/users/${userId}/goals`, {
         method: "POST",

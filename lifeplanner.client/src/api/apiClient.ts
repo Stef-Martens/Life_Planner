@@ -8,11 +8,7 @@ export function useApiClient() {
     options: RequestInit = {},
     handleStatus?: (response: Response) => T | Promise<T>
   ): Promise<T> => {
-    console.log("API request:", endpoint);
-
     const token = isAuthenticated ? await getAccessTokenSilently() : null;
-
-    console.log(token);
 
     const response = await fetch(
       `${import.meta.env.VITE_APP_API_URL}${endpoint}`,
