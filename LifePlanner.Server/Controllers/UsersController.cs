@@ -113,12 +113,13 @@ namespace LifePlanner.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _userService.Delete(id);
+            var user = await _userService.GetById(id);
             if (user == null)
             {
                 return NotFound();
             }
 
+            await _userService.Delete(user.Id);
             return NoContent();
         }
 

@@ -2,107 +2,113 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LifePlanner.Server.Data;
 using LifePlanner.Server.Models;
+using LifePlanner.Server.Services.Interfaces;
 
 namespace LifePlanner.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users/{userId}/goals")]
     [ApiController]
     public class GoalsController : ControllerBase
     {
-        private readonly LifePlannerServerContext _context;
+        private readonly IGoalService _goalService;
 
-        public GoalsController(LifePlannerServerContext context)
+        public GoalsController(IGoalService goalService)
         {
-            _context = context;
+            _goalService = goalService;
         }
 
-        // GET: api/Goals
+        // GET: api/users/{userId}/goals
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Goal>>> GetGoals()
+        public async Task<ActionResult<IEnumerable<Goal>>> GetGoalsByUserId(int userId)
         {
-            return await _context.Goals.ToListAsync();
-        }
-
-        // GET: api/Goals/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Goal>> GetGoal(int id)
-        {
-            var goal = await _context.Goals.FindAsync(id);
-
-            if (goal == null)
+            var goals = await _goalService.GetGoalsByUserId(userId);
+            if (goals == null || !goals.Any())
             {
-                return NotFound();
+                return NotFound("No goals found for the specified user.");
             }
 
-            return goal;
+            return Ok(goals);
         }
 
-        // PUT: api/Goals/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGoal(int id, Goal goal)
+        // GET: api/users/{userId}/goals/{goalId}
+        [HttpGet("{goalId}")]
+        public async Task<ActionResult<Goal>> GetGoalById(int userId, int goalId)
         {
-            if (id != goal.Id)
+            var goal = await _goalService.GetById(goalId);
+
+            if (goal == null || goal.UserId != userId)
             {
-                return BadRequest();
+                return NotFound("Goal not found or does not belong to the user.");
             }
 
-            _context.Entry(goal).State = EntityState.Modified;
+            return Ok(goal);
+        }
+
+        // POST: api/users/{userId}/goals
+        [HttpPost]
+        public async Task<ActionResult<Goal>> PostGoal(int userId, [FromBody] Goal goal)
+        {
+            if (goal.UserId != userId)
+            {
+                return BadRequest("Mismatch between route parameter and goal data.");
+            }
+
+            var createdGoal = await _goalService.Add(goal);
+
+            return CreatedAtAction(
+                nameof(GetGoalById),
+                new { userId, goalId = createdGoal.Id },
+                createdGoal
+            );
+        }
+
+        // PUT: api/users/{userId}/goals/{goalId}
+        [HttpPut("{goalId}")]
+        public async Task<IActionResult> PutGoal(int userId, int goalId, [FromBody] Goal goal)
+        {
+            if (goal.Id != goalId || goal.UserId != userId)
+            {
+                return BadRequest("Mismatch between route parameters and goal data.");
+            }
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _goalService.Update(goal);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception)
             {
-                if (!GoalExists(id))
+                if (!GoalExists(goalId))
                 {
-                    return NotFound();
+                    return NotFound("Goal not found.");
                 }
-                else
-                {
-                    throw;
-                }
+
+                throw;
             }
 
             return NoContent();
         }
 
-        // POST: api/Goals
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Goal>> PostGoal(Goal goal)
+        // DELETE: api/users/{userId}/goals/{goalId}
+        [HttpDelete("{goalId}")]
+        public async Task<IActionResult> DeleteGoal(int userId, int goalId)
         {
-            _context.Goals.Add(goal);
-            await _context.SaveChangesAsync();
+            var goal = await _goalService.GetById(goalId);
 
-            return CreatedAtAction("GetGoal", new { id = goal.Id }, goal);
-        }
-
-        // DELETE: api/Goals/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGoal(int id)
-        {
-            var goal = await _context.Goals.FindAsync(id);
-            if (goal == null)
+            if (goal == null || goal.UserId != userId)
             {
-                return NotFound();
+                return NotFound("Goal not found or does not belong to the user.");
             }
 
-            _context.Goals.Remove(goal);
-            await _context.SaveChangesAsync();
+            await _goalService.Delete(goal.Id);
 
             return NoContent();
         }
 
-        private bool GoalExists(int id)
+        private bool GoalExists(int goalId)
         {
-            return _context.Goals.Any(e => e.Id == id);
+            return _goalService.GetById(goalId) != null;
         }
     }
 }
