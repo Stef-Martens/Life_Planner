@@ -4,7 +4,7 @@ import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import { Navigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import ProtectedRoute from "./ProtectedRoue";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth0();

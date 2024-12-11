@@ -16,5 +16,6 @@ namespace LifePlanner.Server.Services
         {
             return await _goalRepository.GetGoalsByUserID(userId);
         }
+
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using LifePlanner.Server.Models;
 using LifePlanner.Server.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LifePlanner.Server.Controllers
 {
@@ -13,16 +14,22 @@ namespace LifePlanner.Server.Controllers
     public class GoalsController : ControllerBase
     {
         private readonly IGoalService _goalService;
+        private readonly IUserService _userService;
 
-        public GoalsController(IGoalService goalService)
+        public GoalsController(IGoalService goalService, IUserService userService)
         {
             _goalService = goalService;
+            _userService = userService;
         }
 
+
         // GET: api/users/{userId}/goals
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Goal>>> GetGoalsByUserId(int userId)
         {
+            var user = HttpContext.User;
+
             var goals = await _goalService.GetGoalsByUserId(userId);
             if (goals == null || !goals.Any())
             {
@@ -54,6 +61,8 @@ namespace LifePlanner.Server.Controllers
             {
                 return BadRequest("Mismatch between route parameter and goal data.");
             }
+
+            goal.User = await _userService.GetById(userId);
 
             var createdGoal = await _goalService.Add(goal);
 

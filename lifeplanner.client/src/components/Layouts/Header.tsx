@@ -17,6 +17,8 @@ const Header: React.FC = () => {
     { label: "Settings", href: "/settings" },
   ];
 
+  console.log(user?.picture);
+
   return (
     <header className="p-4">
       <div className="mx-auto flex justify-between items-center">

@@ -1,59 +1,42 @@
+import { useApiClient } from "./apiClient";
 import { User } from "../types/user";
 
-const API_URL = "https://localhost:7290/api/Users";
+export function useUserApi() {
+  const apiClient = useApiClient();
 
-export async function getUsers(): Promise<User[]> {
-  const response = await fetch(API_URL);
-  return await response.json();
-}
-
-export async function getUser(id: number): Promise<User> {
-  const response = await fetch(`${API_URL}/${id}`);
-  return await response.json();
-}
-
-export const getUserByAuth0Id = async (auth0Id: string) => {
-  try {
-    const response = await fetch(`${API_URL}/auth0/${auth0Id}`);
-    if (!response.ok) {
-      if (response.status === 404) {
-        // User not found
-        return null;
+  return {
+    getUsers: () => apiClient<User[]>(`/users`),
+    getUser: (id: number) => apiClient<User>(`/users/${id}`),
+    getUserByAuth0Id: async (auth0Id: string): Promise<User | null> => {
+      try {
+        return await apiClient<User>(
+          `/users/auth0/${auth0Id}`,
+          {},
+          async (response: any) => {
+            if (response.status === 404) return null;
+            return response.json();
+          }
+        );
+      } catch (error: any) {
+        if (error.message.includes("404")) {
+          return null;
+        }
+        throw error;
       }
-      throw new Error(`Failed to fetch user: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching user by Auth0 ID:", error);
-    throw error;
-  }
-};
-
-export async function createUser(user: User): Promise<User> {
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
     },
-    body: JSON.stringify(user),
-  });
-  return await response.json();
-}
-
-export async function updateUser(user: User): Promise<User> {
-  const response = await fetch(`${API_URL}/${user.id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(user),
-  });
-  return await response.json();
-}
-
-export async function deleteUser(id: number): Promise<User> {
-  const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
-  return await response.json();
+    createUser: (user: User) =>
+      apiClient<User>(`/users`, {
+        method: "POST",
+        body: JSON.stringify(user),
+      }),
+    updateUser: (user: User) =>
+      apiClient<User>(`/users/${user.id}`, {
+        method: "PUT",
+        body: JSON.stringify(user),
+      }),
+    deleteUser: (id: number) =>
+      apiClient<User>(`/users/${id}`, {
+        method: "DELETE",
+      }),
+  };
 }

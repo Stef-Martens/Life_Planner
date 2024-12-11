@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace LifePlanner.Server.Models
 {
@@ -9,7 +10,8 @@ namespace LifePlanner.Server.Models
 
         [Required]
         public int UserId { get; set; }
-        public User User { get; set; }
+        [JsonIgnore]
+        public User? User { get; set; }
 
         [Required]
         [MaxLength(200)]
@@ -18,8 +20,10 @@ namespace LifePlanner.Server.Models
         [Required]
         public Type Type { get; set; }
 
-        public int? CategoryId { get; set; }
-        public Category Category { get; set; }
+        [Required]
+        public int CategoryId { get; set; }
+        [JsonIgnore]
+        public Category? Category { get; set; }
 
         public decimal? Target { get; set; }
         public string? Unit { get; set; }
@@ -33,7 +37,16 @@ namespace LifePlanner.Server.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsComplete { get; set; }
 
-        public List<Subtask> Subtasks { get; set; }
+        public List<Subtask>? Subtasks { get; set; }
+
+        public Goal()
+        {
+            if (Subtasks == null)
+            {
+                Subtasks = new List<Subtask>();
+            }
+
+        }
     }
 
     public enum Type

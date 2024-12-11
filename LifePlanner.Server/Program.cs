@@ -5,6 +5,9 @@ using LifePlanner.Server.Repositories;
 using LifePlanner.Server.Repositories.Interfaces;
 using LifePlanner.Server.Services.Interfaces;
 using LifePlanner.Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -21,9 +24,47 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<LifePlannerServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LifePlannerServerContext") ?? throw new InvalidOperationException("Connection string 'LifePlannerServerContext' not found.")));
 
-// Add services to the container.
+
+// Add authentication and JWT Bearer services
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://dev-skr3fnrj.eu.auth0.com"; // Replace with your Auth0 domain
+        options.Audience = "https://dev-skr3fnrj.eu.auth0.com/api/v2/"; // Replace with your API audience (from Auth0 settings)
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = "https://dev-skr3fnrj.eu.auth0.com", // Replace with your Auth0 domain
+            ValidateAudience = true,
+            ValidAudience = "https://dev-skr3fnrj.eu.auth0.com/api/v2/", // Replace with your API audience
+            ValidateLifetime = true, // Validate token expiration
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("Token validated successfully.");
+                return Task.CompletedTask;
+            }
+        };
+
+    });
+// builder.Services.AddControllers().AddJsonOptions(options =>
+// {
+//     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+// });
 
 builder.Services.AddControllers();
+
+builder.Services.AddAuthorization();
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

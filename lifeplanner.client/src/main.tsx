@@ -13,6 +13,7 @@ createRoot(document.getElementById("root")!).render(
     clientId={clientId!}
     authorizationParams={{
       redirect_uri: "https://localhost:55583/dashboard",
+      audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE,
     }}
   >
     {/* <StrictMode> */}
