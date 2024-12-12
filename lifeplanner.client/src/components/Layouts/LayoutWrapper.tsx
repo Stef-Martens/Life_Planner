@@ -7,7 +7,10 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   // Determine the layout based on the route
-  const layout = location.pathname === "/" ? LayoutHome : LayoutDashboard;
+  // check if it is a pathname that ends with "question" and then something, like an asterisk
+  const isQuestionPath = location.pathname.match(/\/question.*/);
+  const layout =
+    location.pathname === "/" || isQuestionPath ? LayoutHome : LayoutDashboard;
 
   const SelectedLayout = layout;
   return <SelectedLayout>{children}</SelectedLayout>;
