@@ -1,14 +1,18 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
-import { Navigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import ProtectedRoute from "./ProtectedRoute";
 import IntroGoalQuestions from "../pages/questions/IntroGoalsQuestions";
 
 const AppRoutes: React.FC = () => {
-  const { isLoading } = useAuth0();
+  const { isLoading, isAuthenticated } = useAuth0();
 
   if (isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -16,7 +20,11 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Redirect to home if unauthenticated, otherwise dashboard */}
+      <Route
+        path="*"
+        element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} />}
+      />
 
       <Route path="/" element={<Home />} />
       <Route

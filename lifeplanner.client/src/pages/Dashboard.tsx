@@ -45,6 +45,8 @@ const Dashboard = () => {
       setIsLoading(true);
       await fetchOrCreateUser();
 
+      await logGoals(); // Log goals for the user
+
       setIsLoading(false);
     };
 
@@ -58,8 +60,13 @@ const Dashboard = () => {
     }
 
     try {
-      const goals = await getGoals(userRecord.id);
-      console.log("Goals for user:", goals);
+      let goals = null;
+      if (userRecord.id !== undefined) {
+        goals = await getGoals(userRecord.id);
+        console.log("Goals for user:", goals);
+      } else {
+        console.error("User ID is undefined");
+      }
     } catch (error) {
       console.error("Error fetching goals:", error);
     }
@@ -72,9 +79,6 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
-      <button className="btn" onClick={logGoals}>
-        Log goals
-      </button>
     </div>
   );
 };
