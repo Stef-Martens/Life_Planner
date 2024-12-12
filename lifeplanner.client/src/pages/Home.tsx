@@ -25,8 +25,8 @@ const Home = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-br from-gray-100 to-blue-100">
-      <h1 className="text-4xl font-bold text-gray-700 mb-6 text-center">
+    <div className="h-screen flex flex-col justify-center items-center bg-gradient-to-br ">
+      <h1 className="text-4xl font-bold  mb-6 text-center">
         <ReactTyped
           strings={[
             "Welcome to the Best Life Planner ooit xpxdx3!!! :)))",

@@ -3,6 +3,7 @@ import LogoutButton from "../Buttons/LogoutButton";
 import logo from "../../../public/appa.png";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom"; // Import useLocation
+import { Link } from "react-router-dom";
 
 const Header: React.FC = () => {
   const { user } = useAuth0();
@@ -31,9 +32,9 @@ const Header: React.FC = () => {
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href; // Check if the link is active
               return (
-                <a
+                <Link
                   key={link.href}
-                  href={link.href}
+                  to={link.href}
                   className={`
                     ${isActive ? "text-primary-content font-bold" : ""} 
                     hover:bg-base-300 rounded-full px-6 sm:px-3 md:px-2 lg:px-6 xl:px-8 py-3 transition-colors duration-300
@@ -41,7 +42,7 @@ const Header: React.FC = () => {
                   aria-label={link.label}
                 >
                   {link.label}
-                </a>
+                </Link>
               );
             })}
           </nav>
