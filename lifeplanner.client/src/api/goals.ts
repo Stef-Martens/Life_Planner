@@ -60,5 +60,9 @@ export function useGoalApi() {
       apiClient<void>(`/users/${userId}/goals/${goalId}`, {
         method: "DELETE",
       }),
+    checkIfGoalsAreNeeded: (userId: number) =>
+      apiClient<void>(`/users/${userId}/goals/check`, {
+        method: "GET",
+      }),
   };
 }

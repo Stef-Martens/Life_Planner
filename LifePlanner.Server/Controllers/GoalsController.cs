@@ -36,8 +36,43 @@ namespace LifePlanner.Server.Controllers
                 return NotFound("No goals found for the specified user.");
             }
 
+            // add the check to the return
             return Ok(goals);
         }
+
+        // GET: api/users/{userId}/goals/check
+        [HttpGet("check")]
+        public async Task<ActionResult<object>> CheckIfNewGoalsAreNeeded(int userId)
+        {
+            var goals = await _goalService.GetGoalsByUserId(userId);
+
+            return CheckIfNewGoalsAreNeeded(goals);
+        }
+
+        private object CheckIfNewGoalsAreNeeded(IEnumerable<Goal> goals)
+        {
+            int currentYear = DateTime.Now.Year;
+            int nextYear = currentYear + 1;
+            int currentMonth = DateTime.Now.Month;
+
+            // Check if there are any goals for the current year
+            bool hasCurrentYearGoals = goals.Any(goal => goal.Year == currentYear);
+            if (!hasCurrentYearGoals)
+            {
+                return new { newGoalsNeeded = true, year = currentYear };
+            }
+
+            // Check if it's December and there are no goals for the next year
+            bool isDecember = (currentMonth == 12);
+            bool hasNextYearGoals = goals.Any(goal => goal.Year == nextYear);
+            if (isDecember && !hasNextYearGoals)
+            {
+                return new { newGoalsNeeded = true, year = nextYear };
+            }
+
+            return new { newGoalsNeeded = false };
+        }
+
 
         // GET: api/users/{userId}/goals/{goalId}
         [HttpGet("{goalId}")]
@@ -114,6 +149,7 @@ namespace LifePlanner.Server.Controllers
 
             return NoContent();
         }
+
 
         private bool GoalExists(int goalId)
         {

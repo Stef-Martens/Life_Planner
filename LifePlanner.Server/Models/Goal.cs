@@ -25,6 +25,9 @@ namespace LifePlanner.Server.Models
         [JsonIgnore]
         public Category? Category { get; set; }
 
+        [Required]
+        public int Year { get; set; }
+
         public decimal? Target { get; set; }
         public string? Unit { get; set; }
 

@@ -8,8 +8,9 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user, isAuthenticated } = useAuth0();
   const [userRecord, setUserRecord] = useState<User | null>(null);
+  const [goals, setGoals] = useState([] as any[]);
   const { getUserByAuth0Id, createUser } = useUserApi();
-  const { getGoals } = useGoalApi();
+  const { getGoals, checkIfGoalsAreNeeded } = useGoalApi();
 
   // Prevent re-calling backend if user has already been processed
   const [isUserInitialized, setIsUserInitialized] = useState(false);
@@ -45,7 +46,11 @@ const Dashboard = () => {
       setIsLoading(true);
       await fetchOrCreateUser();
 
-      await logGoals(); // Log goals for the user
+      if (userRecord && userRecord.id) {
+        await getGoalsFromBackend();
+
+        console.log(await checkIfGoalsAreNeeded(userRecord.id));
+      }
 
       setIsLoading(false);
     };
@@ -53,17 +58,15 @@ const Dashboard = () => {
     initializeDashboard();
   }, [user, isAuthenticated, isUserInitialized]); // Dependency array ensures proper updates
 
-  const logGoals = async () => {
+  const getGoalsFromBackend = async () => {
     if (!userRecord) {
       console.error("User record not found");
       return;
     }
 
     try {
-      let goals = null;
       if (userRecord.id !== undefined) {
-        goals = await getGoals(userRecord.id);
-        console.log("Goals for user:", goals);
+        setGoals(await getGoals(userRecord.id));
       } else {
         console.error("User ID is undefined");
       }
