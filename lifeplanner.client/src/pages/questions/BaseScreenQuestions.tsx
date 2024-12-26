@@ -1,57 +1,86 @@
-import { useEffect } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import {ReactNode, useEffect} from "react";
+import {useAuth0} from "@auth0/auth0-react";
+import {useNavigate} from "react-router-dom";
 
-import { ReactNode } from "react";
 
 interface BaseScreenQuestionsProps {
-  children: ReactNode;
-  onBack?: () => void;
-  onContinue?: () => void;
-  loadingText?: string;
+    children: ReactNode;
+    onBack?: () => void;
+    onContinue?: () => void;
+    loadingText?: string;
 }
 
 const BaseScreenQuestions = ({
-  children,
-  onBack,
-  onContinue,
-  loadingText = "Loading...",
-}: BaseScreenQuestionsProps) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+                                 children,
+                                 onBack,
+                                 onContinue,
+                                 loadingText = "Loading...",
+                             }: BaseScreenQuestionsProps) => {
+    const {isAuthenticated, isLoading} = useAuth0();
 
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      window.location.href = "/";
+    const urlPath = window.location.pathname;
+    const match = urlPath.match(/question(\d+)/); // Extract question number
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isAuthenticated && !isLoading) {
+            window.location.href = "/";
+        }
+    }, [isAuthenticated, isLoading]);
+
+    const handleBack = () => {
+        if (onBack) {
+            onBack();
+        } else {
+            if (match) {
+                const currentQuestionNumber = parseInt(match[1], 10);
+                const previousQuestionNumber = currentQuestionNumber - 1;
+                if (previousQuestionNumber > 0) {
+                    navigate(`/question${previousQuestionNumber}${window.location.search}`);
+                    return;
+                }
+            }
+            alert("No previous question!"); // Default behavior if no valid "Back" target
+        }
     }
-  }, [isAuthenticated, isLoading]);
 
-  if (isLoading) {
+    const handleContinue = () => {
+        if (onContinue) {
+            onContinue();
+        } else {
+            if (match) {
+                const currentQuestionNumber = parseInt(match[1], 10);
+                const nextQuestionNumber = currentQuestionNumber + 1;
+                navigate(`/question${nextQuestionNumber}${window.location.search}`);
+            }
+        }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="h-screen w-screen flex justify-center items-center text-white">
+                <div className="flex flex-col items-center">
+                    <div
+                        className="loader ease-linear rounded-full border-4 border-t-4 border-white h-12 w-12 mb-4"></div>
+                    <p>{loadingText}</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-      <div className="h-screen w-screen flex justify-center items-center text-white">
-        <div className="flex flex-col items-center">
-          <div className="loader ease-linear rounded-full border-4 border-t-4 border-white h-12 w-12 mb-4"></div>
-          <p>{loadingText}</p>
+        <div className="h-screen flex flex-col text-white">
+            <div className="flex-grow">{children}</div>
+            <div className="flex justify-between w-screen p-8">
+                <button className="btn btn-error" onClick={handleBack}>
+                    Back
+                </button>
+                <button className="btn btn-success" onClick={handleContinue}>
+                    Continue
+                </button>
+            </div>
         </div>
-      </div>
     );
-  }
-
-  return (
-    <div className="h-screen flex flex-col text-white">
-      <div className="flex-grow">{children}</div>
-      <div className="flex justify-between w-screen p-8">
-        {onBack && (
-          <button className="btn btn-error" onClick={onBack}>
-            Back
-          </button>
-        )}
-        {onContinue && (
-          <button className="btn btn-success" onClick={onContinue}>
-            Continue
-          </button>
-        )}
-      </div>
-    </div>
-  );
 };
 
 export default BaseScreenQuestions;

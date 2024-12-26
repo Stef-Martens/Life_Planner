@@ -1,27 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ReactTyped } from "react-typed";
 import BaseScreen from "./BaseScreenQuestions";
 
 const FinancialGoalsQuestions: React.FC = () => {
-    const navigate = useNavigate();
 
     return (
-        <BaseScreen
-            onBack={() => navigate("/question1")} 
-            onContinue={() => navigate("/question3")} // Replace with the appropriate next page
-        >
-            <div className="h-full flex items-center justify-center">
-                <h1 className="text-4xl font-bold text-center">
-                    <ReactTyped
-                        strings={[
-                            "hihi haha",
-                        ]}
-                        typeSpeed={40}
-                        backSpeed={20}
-                        loop
-                    />
+        <BaseScreen>
+            <div className="h-full flex-col space-between flex items-center justify-center ">
+                <h1 className="text-4xl font-bold content-center basis-1/4">
+                    Financial Goals Questions
                 </h1>
+                <div className="flex basis-3/4 items-center">
+                    <p>Question 1</p>
+                    <p>What is your financial goal?</p>
+                    <input type="text"/>
+                </div>
             </div>
         </BaseScreen>
     );
