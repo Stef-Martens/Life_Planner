@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -10,6 +9,7 @@ import Dashboard from "../pages/Dashboard";
 import { useAuth0 } from "@auth0/auth0-react";
 import ProtectedRoute from "./ProtectedRoute";
 import IntroGoalQuestions from "../pages/questions/IntroGoalsQuestions";
+import FinancialGoalsQuestions from "../pages/questions/FinancialGoalsQuestions.tsx";
 
 const AppRoutes: React.FC = () => {
   const { isLoading, isAuthenticated } = useAuth0();
@@ -43,6 +43,14 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+        <Route
+        path="/question2"
+        element={
+          <ProtectedRoute>
+            <FinancialGoalsQuestions />
+          </ProtectedRoute>
+        }
+        />
     </Routes>
   );
 };

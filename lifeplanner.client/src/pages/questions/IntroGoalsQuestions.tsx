@@ -15,7 +15,7 @@ const IntroGoalQuestions: React.FC = () => {
         <h1 className="text-4xl font-bold text-center">
           <ReactTyped
             strings={[
-              "Are you ready to set your goals for the year?",
+              "Are you ready to set your goals for the year "+new URLSearchParams(window.location.search).get("year")+"?",
               "Let's get started!",
               ":)",
             ]}

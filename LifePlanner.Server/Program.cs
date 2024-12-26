@@ -7,6 +7,9 @@ using LifePlanner.Server.Services.Interfaces;
 using LifePlanner.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Pomelo.EntityFrameworkCore.MySql;
+using System;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +23,33 @@ builder.Services.AddCors(options =>
     });
 });
 
+// check if on windows to see which connection string to use
+var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-builder.Services.AddDbContext<LifePlannerServerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LifePlannerServerContext") ?? throw new InvalidOperationException("Connection string 'LifePlannerServerContext' not found.")));
+// Select connection string based on the operating system
+var connectionString = isWindows 
+    ? builder.Configuration.GetConnectionString("LifePlannerServerContext") 
+    : builder.Configuration.GetConnectionString("LifePlannerServerContextDocker");
 
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string not found.");
+}
+
+// Configure the DbContext based on the OS
+if (isWindows)
+{
+    // Use SQL Server on Windows
+    builder.Services.AddDbContext<LifePlannerServerContext>(options =>
+        options.UseSqlServer(connectionString));
+}
+else
+{
+    // Use MySQL on non-Windows platforms (like macOS)
+    builder.Services.AddDbContext<LifePlannerServerContext>(options =>
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+}
 
 // Add authentication and JWT Bearer services
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -52,7 +78,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 return Task.CompletedTask;
             }
         };
-
     });
 // builder.Services.AddControllers().AddJsonOptions(options =>
 // {

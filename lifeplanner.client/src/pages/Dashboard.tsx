@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserApi } from "../api/users";
 import { useGoalApi } from "../api/goals";
 import { User } from "../types/user";
@@ -49,7 +49,12 @@ const Dashboard = () => {
       if (userRecord && userRecord.id) {
         await getGoalsFromBackend();
 
-        console.log(await checkIfGoalsAreNeeded(userRecord.id));
+        var goalsNeeded = await checkIfGoalsAreNeeded(userRecord.id);
+        console.log(goalsNeeded);
+        if(goalsNeeded?.newGoalsNeeded) {
+          // go to question page 1
+          window.location.href = "/question1?year=" + goalsNeeded?.year;
+        }
       }
 
       setIsLoading(false);

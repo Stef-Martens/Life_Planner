@@ -9,15 +9,17 @@ export function useApiClient() {
     handleStatus?: (response: Response) => T | Promise<T>
   ): Promise<T> => {
     const token = isAuthenticated ? await getAccessTokenSilently() : null;
-
+    
     const response = await fetch(
       `${import.meta.env.VITE_APP_API_URL}${endpoint}`,
       {
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${token}`,
+          //...(token ? {  } : {}),
           ...options.headers,
         },
+        //credentials: "include",
         ...options,
       }
     );

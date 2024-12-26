@@ -31,7 +31,7 @@ namespace LifePlanner.Server.Controllers
             var user = HttpContext.User;
 
             var goals = await _goalService.GetGoalsByUserId(userId);
-            if (goals == null || !goals.Any())
+            if (!goals.Any())
             {
                 return NotFound("No goals found for the specified user.");
             }
@@ -51,20 +51,21 @@ namespace LifePlanner.Server.Controllers
 
         private object CheckIfNewGoalsAreNeeded(IEnumerable<Goal> goals)
         {
-            int currentYear = DateTime.Now.Year;
-            int nextYear = currentYear + 1;
-            int currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+            var nextYear = currentYear + 1;
+            var currentMonth = DateTime.Now.Month;
 
             // Check if there are any goals for the current year
-            bool hasCurrentYearGoals = goals.Any(goal => goal.Year == currentYear);
+            var enumerable = goals as Goal[] ?? goals.ToArray();
+            var hasCurrentYearGoals = enumerable.Any(goal => goal.Year == currentYear);
             if (!hasCurrentYearGoals)
             {
                 return new { newGoalsNeeded = true, year = currentYear };
             }
 
             // Check if it's December and there are no goals for the next year
-            bool isDecember = (currentMonth == 12);
-            bool hasNextYearGoals = goals.Any(goal => goal.Year == nextYear);
+            var isDecember = (currentMonth == 12);
+            var hasNextYearGoals = enumerable.Any(goal => goal.Year == nextYear);
             if (isDecember && !hasNextYearGoals)
             {
                 return new { newGoalsNeeded = true, year = nextYear };

@@ -20,8 +20,8 @@ namespace LifePlanner.Server.Models
         [Required]
         public Type Type { get; set; }
 
-        [Required]
-        public int CategoryId { get; set; }
+        //[Required]
+        public int? CategoryId { get; set; }
         [JsonIgnore]
         public Category? Category { get; set; }
 
