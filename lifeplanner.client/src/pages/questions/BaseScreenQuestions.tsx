@@ -1,7 +1,8 @@
 import {ReactNode, useEffect} from "react";
 import {useAuth0} from "@auth0/auth0-react";
 import {useNavigate} from "react-router-dom";
-
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
 
 interface BaseScreenQuestionsProps {
     children: ReactNode;
@@ -58,7 +59,7 @@ const BaseScreenQuestions = ({
 
     if (isLoading) {
         return (
-            <div className="h-screen w-screen flex justify-center items-center text-white">
+            <div className="h-screen w-screen flex justify-center items-center ">
                 <div className="flex flex-col items-center">
                     <div
                         className="loader ease-linear rounded-full border-4 border-t-4 border-white h-12 w-12 mb-4"></div>
@@ -69,17 +70,20 @@ const BaseScreenQuestions = ({
     }
 
     return (
-        <div className="h-screen flex flex-col text-white">
-            <div className="flex-grow">{children}</div>
-            <div className="flex justify-between w-screen p-8">
-                <button className="btn btn-error" onClick={handleBack}>
-                    Back
-                </button>
-                <button className="btn btn-success" onClick={handleContinue}>
-                    Continue
-                </button>
+        <DndProvider backend={HTML5Backend}>
+            <div className="h-screen flex flex-col">
+                <div className="flex-grow">{children}</div>
+                <div className="flex justify-between w-screen p-8">
+                    <button className="btn btn-error" onClick={handleBack}>
+                        Back
+                    </button>
+                    <button className="btn btn-success" onClick={handleContinue}>
+                        Continue
+                    </button>
+                </div>
             </div>
-        </div>
+        </DndProvider>
+
     );
 };
 
