@@ -32,18 +32,16 @@ const Dropzone: React.FC<DropzoneProps> = ({thisList, otherList, setThisList, se
             isOver: monitor.isOver(),
         }),
     }));
-
+    
 
     return (
         <div
-            className={`dropzone ${isOver ? "bg-secondary-content" : ""} border-neutral border-dashed border-2 w-full h-full `}
+            className={`dropzone ${isOver ? "bg-secondary-content" : ""}  border-neutral border-dashed border-4 w-full h-fit min-h-52 flex items-center space-x-4 p-4 overflow-scroll`}
             ref={drop}
         >
-            <div className="flex space-x-8 overflow-scroll">
-                {thisList.map((card) => (
-                    <DragnDropCard key={card.id} id={card.id} title={card.title} description={card.description}/>
-                ))}
-            </div>
+            {thisList.map((card) => (
+                <DragnDropCard key={card.id} id={card.id} title={card.title} description={card.description}/>
+            ))}
         </div>
     );
 };

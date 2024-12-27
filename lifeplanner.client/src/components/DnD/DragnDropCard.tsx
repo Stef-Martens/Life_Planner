@@ -21,7 +21,7 @@ const DragnDropCard: React.FC<DragnDropCardProps> = ({id, title, description}) =
     }));
 
     return (
-        <div className="" ref={drag} style={{border: isDragging ? "10px solid pink" : "0px"}}>
+        <div className="" ref={drag} style={{border: isDragging ? "5px solid orange" : "0px"}}>
             <div className="card-body bg-neutral">
                 <h2 className="card-title text-neutral-content">{title}</h2>
                 <p className="text-neutral-content">{description}</p>
