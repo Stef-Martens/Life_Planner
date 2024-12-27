@@ -9,7 +9,7 @@ namespace LifePlanner.Server.Services
         private readonly IGenericRepository<T> _repository;
         public GenericService(IGenericRepository<T> repository)
         {
-            _repository = repository;
+             _repository = repository;
         }
         public async Task<IEnumerable<T>> GetAll()
         {

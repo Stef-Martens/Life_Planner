@@ -4,10 +4,10 @@ using LifePlanner.Server.Services.Interfaces;
 
 namespace LifePlanner.Server.Services
 {
-    public class UserService : GenericService<User>, IUserService
+    public class UsersService : GenericService<User>, IUserService
     {
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository) : base(userRepository)
+        public UsersService(IUserRepository userRepository) : base(userRepository)
         {
             _userRepository = userRepository;
         }

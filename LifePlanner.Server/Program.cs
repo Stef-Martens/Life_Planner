@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Pomelo.EntityFrameworkCore.MySql;
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +65,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = "https://dev-skr3fnrj.eu.auth0.com/api/v2/", // Replace with your API audience
             ValidateLifetime = true, // Validate token expiration
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mockSecretKey")), // Add this line
+            IssuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
+            {
+                var client = new HttpClient();
+                var json = client.GetStringAsync("https://dev-skr3fnrj.eu.auth0.com/.well-known/jwks.json").Result;
+                var keys = new JsonWebKeySet(json).Keys;
+                return keys;
+            }
+
         };
         options.Events = new JwtBearerEvents
         {
@@ -97,7 +107,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UsersService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IGoalService, GoalService>();
@@ -132,3 +142,7 @@ app.MapControllers();
 app.MapFallbackToFile("/index.html");
 
 app.Run();
+
+
+public partial class Program { }
+
