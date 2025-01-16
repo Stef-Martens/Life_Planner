@@ -16,7 +16,6 @@ const Dropzone: React.FC<DropzoneProps> = ({thisList, otherList, setThisList, se
             setThisList((prevThisList) => {
                 // Ensure immutability and check if the item is not already in the list
                 if (!prevThisList.find((card) => card.id === item.id)) {
-                    console.log("Adding to thisList:", [...prevThisList, item]);
                     return [...prevThisList, item];
                 }
                 return prevThisList;
@@ -24,7 +23,6 @@ const Dropzone: React.FC<DropzoneProps> = ({thisList, otherList, setThisList, se
 
             setOtherList((prevOtherList) => {
                 const updatedOtherList = prevOtherList.filter((card) => card.id !== item.id);
-                console.log("Updated otherList:", updatedOtherList);
                 return updatedOtherList;
             });
         },
@@ -32,7 +30,7 @@ const Dropzone: React.FC<DropzoneProps> = ({thisList, otherList, setThisList, se
             isOver: monitor.isOver(),
         }),
     }));
-    
+
 
     return (
         <div
