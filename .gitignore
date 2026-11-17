@@ -30,3 +30,6 @@ server/dist/
 # Keep these essential files
 !project.sln
 !readme.md
+
+# JetBrains Rider
+.idea/
